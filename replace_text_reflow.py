@@ -1,41 +1,5 @@
 import fitz  # Import the PyMuPDF library
 
-def replace_text_in_pdf(original_pdf_path, output_pdf_path, tag, replacement_text):
-    """
-    Replace specified text in a PDF file with new text.
-
-    This function searches for all instances of a given tag in the PDF and replaces it with the provided replacement text.
-    Unlike the `replace_text_and_reflow` function, this function does not reflow the text but overlays the new text over the old one.
-
-    Args:
-    original_pdf_path (str): The path to the original PDF file.
-    output_pdf_path (str): The path where the modified PDF will be saved.
-    tag (str): The text to be replaced in the PDF.
-    replacement_text (str): The text that will replace the tag.
-
-    Returns:
-    None
-    """
-
-    # Open the original PDF
-    doc = fitz.open(original_pdf_path)
-
-    # Iterate over each page in the document
-    for page in doc:
-        # Search for all instances of the tag on the page
-        text_instances = page.search_for(tag)
-
-        # Iterate over each found instance
-        for inst in text_instances:
-            # Mark the area where the tag is found for redaction
-            page.add_redact_annot(inst, text=replacement_text)
-        
-        # Apply redactions, which removes the marked text and adds the new text
-        page.apply_redactions()
-
-    # Save the modified document
-    doc.save(output_pdf_path)
-
 def replace_text_and_reflow(original_pdf_path, output_pdf_path, tag, replacement_text):
     """
     Replace a specified tag in a PDF with new text and reflow the text to fit the original layout.
@@ -76,6 +40,42 @@ def replace_text_and_reflow(original_pdf_path, output_pdf_path, tag, replacement
 
             # Add the new text with the adjusted textbox size
             page.insert_textbox(new_rect, replacement_text, fontname=font, fontsize=font_size)
+
+    # Save the modified document
+    doc.save(output_pdf_path)
+
+def replace_text_in_pdf(original_pdf_path, output_pdf_path, tag, replacement_text):
+    """
+    Replace specified text in a PDF file with new text.
+
+    This function searches for all instances of a given tag in the PDF and replaces it with the provided replacement text.
+    Unlike the `replace_text_and_reflow` function, this function does not reflow the text but overlays the new text over the old one.
+
+    Args:
+    original_pdf_path (str): The path to the original PDF file.
+    output_pdf_path (str): The path where the modified PDF will be saved.
+    tag (str): The text to be replaced in the PDF.
+    replacement_text (str): The text that will replace the tag.
+
+    Returns:
+    None
+    """
+
+    # Open the original PDF
+    doc = fitz.open(original_pdf_path)
+
+    # Iterate over each page in the document
+    for page in doc:
+        # Search for all instances of the tag on the page
+        text_instances = page.search_for(tag)
+
+        # Iterate over each found instance
+        for inst in text_instances:
+            # Mark the area where the tag is found for redaction
+            page.add_redact_annot(inst, text=replacement_text)
+        
+        # Apply redactions, which removes the marked text and adds the new text
+        page.apply_redactions()
 
     # Save the modified document
     doc.save(output_pdf_path)
